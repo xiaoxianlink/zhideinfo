@@ -1,0 +1,92 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="utf-8">
+	<title>安全消息</title>
+	<link rel="stylesheet" type="text/css" href="http://zhide.xiaoxianlink.com/statics/zhide/css/normalize.css">
+	<link rel="stylesheet" type="text/css" href="http://zhide.xiaoxianlink.com/statics/zhide/css/setting.css">
+	<link rel="stylesheet" type="text/css" href="http://zhide.xiaoxianlink.com/statics/zhide/css/icons.css">
+	<link rel="stylesheet" type="text/css" href="http://zhide.xiaoxianlink.com/statics/zhide/css/component.css">
+	<link rel="stylesheet" type="text/css" href="http://zhide.xiaoxianlink.com/statics/zhide/css/weui.min.css">
+	
+	<script src="http://zhide.xiaoxianlink.com/statics/zhide/js/modernizr.js"></script>
+	
+	<script src="http://zhide.xiaoxianlink.com/statics/zhide/js/jquery-1.7.2.min.js"></script>
+	<script src="http://zhide.xiaoxianlink.com/statics/zhide/js/jquery-ui.min.js"></script>
+	<script src="http://zhide.xiaoxianlink.com/statics/zhide/js/jquery.ui.touch-punch.min.js"></script>
+	
+	<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+	<script>
+		var mode = 1;
+		var timeout = 10;
+		
+		function setMsgTimeout(t){
+			if(typeof(t) == "number"){
+				
+			}
+		}
+		
+		function setMsgMode(m){
+			
+		}
+		
+		$(function() {
+			if(mode == 2){
+				$("#mode").html("每人一次");
+			}
+			$("#timeout_" + timeout).addClass("weui-btn_primary");
+			$("#timeout_" + timeout).css("color", "#fff");
+			
+		});
+		
+	</script>
+</head>
+<body>
+	<div id="st-container" class="st-container">
+		<!-- 	
+			example menus 
+			these menus will be on top of the push wrapper
+		-->
+		<nav class="st-menu st-effect-13" id="menu-13">
+			<h2 class="icon icon-stack">只得</h2>
+			<ul>
+				<li><a class="icon icon-data" href="#" onclick="setMsgMode(1);">只得一次</a></li>
+				<li><a class="icon icon-location" href="#" onclick="setMsgMode(2);">每人一次</a></li>
+			</ul>
+		</nav>
+
+		<div class="st-pusher">
+			<div class="st-content" style="position: relative;min-height:200px;">
+				<div class="st-content-inner">	
+					<div class="codrops-top clearfix">
+						<div id="st-trigger-effects">
+							<button id="mode" data-effect="st-effect-13">只得一次</button>
+						</div>
+					</div>
+				</div>
+				<div style="width:80%;margin:auto;height:15%;line-height: 80px;display:table;">
+					<div id="title" style="display:table-cell;width:100%;vertical-align: middle;text-align:center;">
+						这是一个只得消息
+					</div>
+				</div>
+				<div style="width:80%;margin:auto;height:60%;display:table;">
+					<div style="display:table-cell;vertical-align: middle">
+						<a href="#" id="timeout_5" class="weui-btn weui-btn_plain-primary timeout" onclick="setMsgTimeout(5);"><span>5秒</span></a>
+						<a href="#" id="timeout_10" class="weui-btn weui-btn_plain-primary timeout" onclick="setMsgTimeout(10);"><span>10秒</span></a>
+						<a href="#" id="timeout_15" class="weui-btn weui-btn_plain-primary timeout" onclick="setMsgTimeout(15);"><span>15秒</span></a>
+					</div>
+				</div>
+			</div>
+			
+			<div class="weui-footer weui-footer_fixed-bottom">
+				<div class="weui-btn weui-btn_primary" style="width:90%">
+					点击右上角直接分享
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="http://zhide.xiaoxianlink.com/statics/zhide/js/classie.js"></script>
+	<script src="http://zhide.xiaoxianlink.com/statics/zhide/js/sidebarEffects.js"></script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="utf-8">
+	<title>查看{$timeout}秒后销毁</title>
+	<script src="__ROOT__/statics/zhide/js/jquery-1.7.2.min.js"></script>
+	<script src="__ROOT__/statics/zhide/js/jquery-ui.min.js"></script>
+	<script src="__ROOT__/statics/zhide/js/jquery.ui.touch-punch.min.js"></script>
+	<style>
+	.msgBox { padding: 0px; float: left; height: 450px;}
+	.msgBody { position: absolute; bottom: 0px; left:0px; right:0px; height: 450px; }
+	</style>
+	<script src="__ROOT__/statics/zhide/js/weixin.js"></script>
+	<script>
+		var boxHeight = 450;
+		var count = {$timeout};
+		var timer;
+
+		var img_width = {$img_width};
+		var img_height = {$img_height};
+		
+		var readed = false;
+		
+		function readMsg(){
+			if(readed == false){
+				$.get(
+					"index.php?g=weixin&m=msg&a=read", 
+					{id: "{$msg_id}", open_id:"{$open_id}", nickname: "{$nickname}", headimgurl: "{$headimgurl}"});
+			}
+		}
+
+		function destoryMsg(){
+			//console.log("destory the message");
+			$( "#msg" ).hide();
+		}
+
+		function countDown(){
+			count = count - 1;
+			if(count == 0){
+				$( "#draggable" ).trigger("mouseup");
+				$( "#draggable" ).trigger("end");
+				destoryMsg();
+				$( "#draggable" ).html("内容已销毁");
+				$( "#draggable" ).draggable( "destroy" );
+				$( "#destory" ).css("display", "table");
+				clearInterval(timer);
+			}
+			else{
+				$( "#draggable" ).html(count + "秒");
+			}
+		}
+
+		function onTouchStart(e){
+			readMsg();
+			if(count > 0){
+			  $( "#draggable" ).html(count + "秒");
+			  if(typeof timer == "undefined"){
+				timer = setInterval(countDown, 1000);
+			  }
+			  $("#ctrl").css('opacity', '0');
+			  $("#mask").css('opacity', '0');
+			  //$("#draggable").css('opacity', '0');
+			}
+			e.preventDefault();
+		}
+		function onTouchEnd(e){
+			$("#ctrl").css('opacity', '1');
+			$("#mask").css('opacity', '1');
+			//$("#draggable").css('opacity', '1');
+			e.preventDefault();
+		}
+
+		function onDrag(){
+			var top = $( "#draggable" ).position().top;
+			$("#mask").height(boxHeight - top);
+		}
+		function revert(){
+			$("#mask").height(boxHeight);
+			$("#ctrl").css('opacity', '1');
+			$("#mask").css('opacity', '1');
+			return true;
+		}
+		$(function() {
+			// adjust height according screen
+			boxHeight = window.innerHeight - 20;
+			boxWidth = window.innerWidth - 20;
+			$("#msgBox").height(boxHeight);
+			$("#msg").height(boxHeight);
+			
+			direct = 1; // 横向
+			if(img_width < img_height){
+				direct = 2; // 纵向
+			}
+			if(direct == 1){
+				if(img_width > boxWidth){
+					if(img_height * boxWidth / img_width <= boxHeight){
+						$("#msg_image").width(boxWidth);
+						$("#msg_image").height(img_height * boxWidth / img_width);
+					}
+					else{
+						$("#msg_image").height(img_height);
+						$("#msg_image").width(img_width * boxHeight / img_height);
+					}
+				}
+				else{
+					$("#msg_image").width(img_width);
+					$("#msg_image").height(img_height * boxWidth / img_width);
+				}
+			}
+			else{
+				if(img_height > boxHeight){
+					if(img_width * boxHeight / img_height <= boxWidth){
+						$("#msg_image").height(boxHeight);
+						$("#msg_image").width(img_width * boxHeight / img_height);
+					}
+					else{
+						$("#msg_image").width(boxWidth);
+						$("#msg_image").height(img_height * boxWidth / img_width);
+					}
+				}
+				else{
+					$("#msg_image").height(img_height);
+					$("#msg_image").width(img_width * boxHeight / img_height);
+				}
+			}
+			$("#ctrl").height(boxHeight);
+			$("#mask").height(boxHeight);
+			// bind event
+			$( "#draggable" ).draggable({ axis: "y", containment: "parent", drag: onDrag, revert: revert, revertDuration: 0});
+			$("#ctrlBtn").on('touchstart mousedown', onTouchStart); 
+			$("#ctrlBtn").on('touchend mouseup', onTouchEnd);
+		});
+	</script>
+</head>
+<body style="background: #ccc;">
+	<div id="msgBox" class="msgBox" style="position: relative; width:100%;">
+		<div id="draggable" class="ui-widget-header" style="z-index: 999;height:40px;line-height: 40px;text-align: center;background: #33BBFF;">
+		  按住按钮 向下滑动解锁
+		</div>
+		<div id="msg" class="msgBody" style="z-index: 1;width:100%">
+		  <img id="msg_image" src="__ROOT__/upload/Weixin/{$img_path}" style="margin:0px auto;display:block" >
+		</div>
+		<div id="ctrl" class="msgBody" style="z-index: 10; background: #ccc; opacity: 1;">
+			<p id="ctrlBtn" style="width:60px;height:60px;text-align:center;font-size:40px;display:inline;">得</p>
+			<p style="display:inline;">按住得查看图片</p>
+		</div>
+		<div id="mask" class="msgBody" style="z-index: 101; background: #ccc; "></div>
+	</div>
+	<div id="destory" style="z-index: 201; width:95%;margin:auto;height:90%;display:none;position:absolute;">
+		<div style="display:table-cell;vertical-align: middle;margin: auto;width: 100%;text-align: center;">
+			<img src="/statics/images/zhide.jpeg" style="width:129px;height:129px;">
+			<div>只得，让价值信息有效传播</div>
+		</div>
+	</div>
+</body>
+</html>

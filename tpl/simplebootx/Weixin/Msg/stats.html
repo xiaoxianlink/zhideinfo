@@ -1,0 +1,44 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="utf-8">
+	<title>只得</title>
+	<script src="__ROOT__/statics/zhide/js/weixin.js"></script>
+	<script src="__ROOT__/statics/zhide/js/stats.js"></script>
+	<style>
+		.inline {
+			display: inline-block
+		}
+		.headimg {
+			max-width: 45px;
+			max-height: 45px;
+		}
+		.timelabel {
+			width:100%;
+			text-align: center;
+		}
+	</style>
+</head>
+<body style="background: #ccc; ">
+	<div style="height:40px;line-height: 40px;text-align: center;background: #33BBFF;">
+	  <?php echo count($readers) ?>人已查看
+	</div>
+	<div>
+		<volist name="readers" id="reader">
+		<div class="timelabel">
+			<script>showHeadTime(now, convertDate({$reader["ctime"]} * 1000));</script>
+		</div>
+		<div>
+			<div class="inline">
+				<img src="{$reader['headimgurl']}" class="headimg">
+			</div>
+			<div class="inline">
+				<div>{$reader["nickname"]}</div>
+				<div><script>showReadTime(now, convertDate({$reader["ctime"]} * 1000));</script></div>
+			</div>
+		</div>
+		</volist>
+	</div>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="utf-8">
+	<title>安全消息</title>
+	<link rel="stylesheet" type="text/css" href="__ROOT__/statics/zhide/css/normalize.css">
+	<link rel="stylesheet" type="text/css" href="__ROOT__/statics/zhide/css/setting.css">
+	<link rel="stylesheet" type="text/css" href="__ROOT__/statics/zhide/css/icons.css">
+	<link rel="stylesheet" type="text/css" href="__ROOT__/statics/zhide/css/component.css">
+	<link rel="stylesheet" type="text/css" href="__ROOT__/statics/zhide/css/weui.min.css">
+	<style>
+         body{
+              background:url(__ROOT__/upload/Weixin/{$img_path}) no-repeat center top;
+              background-size:contain;
+         }
+         input{
+              
+         }
+        </style>
+	<script src="__ROOT__/statics/zhide/js/modernizr.js"></script>
+	
+	<script src="__ROOT__/statics/zhide/js/jquery-1.7.2.min.js"></script>
+	<script src="__ROOT__/statics/zhide/js/jquery-ui.min.js"></script>
+	<script src="__ROOT__/statics/zhide/js/jquery.ui.touch-punch.min.js"></script>
+	
+	<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+	<script>
+		var mode = {$mode};
+		var timeout = {$timeout};
+
+		var shareImg = "http://zhide.xiaoxianlink.com/statics/zhide/images/{$timeout}s.png";
+		var shareLink = "http://zhide.xiaoxianlink.com/index.php?g=weixin&m=msg&a=index&id={$msg_id}";
+		var shareDesc = "阅读{$timeout}秒后自动销毁"; 
+		var shareTitle = "{$msg_title}";
+
+		function setMsgTimeout(t){
+			if(typeof(t) == "number"){
+				$.get(
+					"http://zhide.xiaoxianlink.com/index.php?g=weixin&m=msg&a=edit",
+					{id: "{$msg_id}", open_id:"{$open_id}", timeout: t},
+					function(data){
+						if(data["status"] == 0){
+							timeout = t;
+							$(".timeout").removeClass("weui-btn_primary");
+							$(".timeout").css("color", "");
+							$("#timeout_" + timeout).addClass("weui-btn_primary");
+							shareDesc = "阅读" + timeout + "秒后自动销毁";
+							shareImg = "http://zhide.xiaoxianlink.com/statics/zhide/images/" + timeout + "s.png";
+							resetWeixin();
+						}
+					}
+				);
+			}
+		}
+
+		function setMsgMode(m){
+			$.get(
+				"http://zhide.xiaoxianlink.com/index.php?g=weixin&m=msg&a=edit", 
+				{id: "{$msg_id}", open_id:"{$open_id}", mode: m},
+				function(data){
+					if(data["status"] == 0){
+						mode = m;
+						modeDesc = "只得一次";
+						if(mode == 2){
+							modeDesc = "每人一次";
+						}
+						$("#mode").html(modeDesc);
+						$("#st-container").removeClass("st-menu-open");
+						resetWeixin();
+					}
+				}
+			);
+		}
+		
+		function resetWeixin(){
+			resetOptionMenu();
+			resetShareAction();
+		}
+		
+		function resetOptionMenu(){
+			wx.hideAllNonBaseMenuItem();
+			wx.showMenuItems({
+				menuList: ["menuItem:share:appMessage","menuItem:share:timeline"]
+			});
+		}
+		
+		function resetShareAction(){
+			wx.onMenuShareAppMessage({
+				title: shareTitle,
+				link: shareLink,
+				imgUrl: shareImg,
+				desc: shareDesc,
+				success: function (res) {
+					//alert('分享给朋友成功');
+				},
+				cancel: function (res) {
+					//alert('你没有分享给朋友');
+				}
+			});
+			
+			wx.onMenuShareTimeline({
+				title: shareTitle,
+				link: shareLink,
+				imgUrl: shareImg,
+				success: function () { 
+					 //alert('分享到朋友圈成功');
+				},
+				cancel: function () { 
+					 //alert('你没有分享到朋友圈');
+				}
+			});
+		}
+		
+		function editTitle(){  
+			var tl = $("#title");  
+			var text = tl.text().trim();
+			tl.html(""); 
+			var input = $("<input>"); 
+			input.attr("value", ""); 
+			input.attr("maxlength", 24);
+			input.attr("style", "padding: 4px 2px; font-size: 22px;"); 
+            input.blur(function(event) {  
+				var inputtext = input.val().trim();   
+				var tlNode = input.parent();
+				if(inputtext != "" && inputtext != shareTitle){
+					$.get(
+						"http://zhide.xiaoxianlink.com/index.php?g=weixin&m=msg&a=edit",
+						{id: "{$msg_id}", open_id:"{$open_id}", title: inputtext},
+						function(data){
+							if(data["status"] == 0){
+								shareTitle = inputtext;
+								tlNode.html(shareTitle);
+								resetWeixin();
+							}
+						}
+					);
+				}
+				
+				tlNode.click(editTitle); 
+			});
+		  
+			//5.把文本框加到tl中去  
+			tl.append(input);//也可以用input.appendTo(td);  
+		  
+			//5.5让文本狂中的文字被高亮选中  
+			//需要将jquery的对象转换为dom对象  
+			var inputdom = input.get(0);  
+			inputdom.select();  
+			//6.清除td上注册的点击事件  
+			tl.unbind("click");  
+		} 
+
+		wx.config({
+			debug: false, 
+			appId: "{$appId}", // 必填，公众号的唯一标识
+			timestamp: "{$timestamp}", // 必填，生成签名的时间戳
+			nonceStr: "{$nonceStr}", // 必填，生成签名的随机串
+			signature: "{$signature}",// 必填，签名，见附录1
+			jsApiList: ['hideAllNonBaseMenuItem','showMenuItems','onMenuShareAppMessage','onMenuShareTimeline'] 
+		});
+
+		wx.ready(function(){
+			resetWeixin();
+		});
+		
+		$(function() {
+			if(mode == 2){
+				$("#mode").html("每人一次");
+			}
+			$("#timeout_" + timeout).addClass("weui-btn_primary");
+			$("#timeout_" + timeout).css("color", "#fff");
+			
+			var titleLabel = $("#title");  
+			//给所有的td节点增加点击事件  
+			titleLabel.click(editTitle);  
+			
+		});
+	</script>
+</head>
+<body>
+	<div id="st-container" class="st-container">
+		<!-- 	
+			example menus 
+			these menus will be on top of the push wrapper
+		-->
+		<nav class="st-menu st-effect-13" id="menu-13">
+			<h2 class="icon icon-stack">只得</h2>
+			<ul>
+				<li><a class="icon icon-data" href="#" onclick="setMsgMode(1)">只得一次</a></li>
+				<li><a class="icon icon-location" href="#" onclick="setMsgMode(2)">每人一次</a></li>
+			</ul>
+		</nav>
+
+		<div class="st-pusher">
+			<div class="st-content" style="position: relative;min-height:200px;">
+				<div class="st-content-inner">	
+					<div class="codrops-top clearfix">
+						<div id="st-trigger-effects">
+							<button id="mode" data-effect="st-effect-13">只得一次</button>
+						</div>
+					</div>
+				</div>
+				<div style="width:80%;margin:auto;height:15%;line-height: 80px;display:table;">
+					<div id="title" style="display:table-cell;width:100%;vertical-align: middle;text-align:center;font-size:26px">
+						{$msg_title}
+					</div>
+				</div>
+				<div style="width:80%;margin:auto;height:60%;display:table;">
+					<div style="display:table-cell;vertical-align: middle">
+						<a href="#" id="timeout_5" class="weui-btn weui-btn_plain-primary timeout" onclick="setMsgTimeout(5);"><span>5秒</span></a>
+						<a href="#" id="timeout_10" class="weui-btn weui-btn_plain-primary timeout" onclick="setMsgTimeout(10);"><span>10秒</span></a>
+						<a href="#" id="timeout_15" class="weui-btn weui-btn_plain-primary timeout" onclick="setMsgTimeout(15);"><span>15秒</span></a>
+					</div>
+				</div>
+			</div>
+			
+			<div class="weui-footer weui-footer_fixed-bottom">
+				<div class="weui-btn weui-btn_primary" style="width:90%">
+					点击右上角直接分享
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="__ROOT__/statics/zhide/js/classie.js"></script>
+	<script src="__ROOT__/statics/zhide/js/sidebarEffects.js"></script>
+</body>
+</html>
